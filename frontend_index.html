@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculadora de Cashback</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --accent: #2563eb;
+        --accent-light: #eff6ff;
+        --surface: #ffffff;
+        --surface-2: #f8fafc;
+        --border: #e2e8f0;
+        --text: #0f172a;
+        --text-2: #64748b;
+        --success-bg: #f0fdf4;
+        --success-border: #86efac;
+        --success-text: #166534;
+        --warning-bg: #fffbeb;
+        --warning-text: #92400e;
+        --radius: 10px;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #f1f5f9;
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem 1rem;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 560px;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+      header h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text);
+      }
+      header p {
+        font-size: 0.875rem;
+        color: var(--text-2);
+        margin-top: 4px;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 1rem;
+      }
+      .form-group:last-child {
+        margin-bottom: 0;
+      }
+      label {
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--text-2);
+      }
+
+      select,
+      input[type="number"] {
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--text);
+        font-size: 0.9375rem;
+        transition: border-color 0.15s;
+      }
+      select:focus,
+      input:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+
+      .btn-primary {
+        width: 100%;
+        height: 42px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 1rem;
+        transition: opacity 0.15s;
+      }
+      .btn-primary:hover {
+        opacity: 0.88;
+      }
+
+      /* ── Result ─────────────────────────────────── */
+      .result-card {
+        display: none;
+      }
+      .result-header {
+        background: var(--success-bg);
+        border: 1px solid var(--success-border);
+        border-radius: var(--radius) var(--radius) 0 0;
+        padding: 1rem 1.25rem;
+      }
+      .result-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--success-text);
+      }
+      .result-value {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: var(--success-text);
+        line-height: 1.2;
+      }
+
+      .result-detail {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-top: none;
+        border-radius: 0 0 var(--radius) var(--radius);
+        padding: 0 1.25rem;
+      }
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.875rem;
+      }
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+      .detail-key {
+        color: var(--text-2);
+      }
+      .detail-val {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 99px;
+        margin-left: 6px;
+      }
+      .badge-vip {
+        background: #ede9fe;
+        color: #4c1d95;
+      }
+      .badge-dobro {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      /* ── History ────────────────────────────────── */
+      .section-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-2);
+        margin-bottom: 12px;
+      }
+
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 1rem;
+      }
+      .metric {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+      }
+      .metric-label {
+        font-size: 0.6875rem;
+        color: var(--text-2);
+        font-weight: 500;
+      }
+      .metric-value {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-top: 2px;
+      }
+
+      .hist-empty {
+        font-size: 0.875rem;
+        color: var(--text-2);
+        text-align: center;
+        padding: 1.5rem 0;
+      }
+      .hist-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 11px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .hist-row:last-child {
+        border-bottom: none;
+      }
+      .hist-tipo {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text);
+      }
+      .hist-sub {
+        font-size: 0.75rem;
+        color: var(--text-2);
+        margin-top: 2px;
+      }
+      .hist-cash {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      footer {
+        margin-top: 1.5rem;
+        font-size: 0.75rem;
+        color: var(--text-2);
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>💰 Calculadora de Cashback</h1>
+        <p>Insira os dados da compra para calcular o seu cashback</p>
+      </header>
+
+      <div class="card">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tipo">Tipo de cliente</label>
+            <select id="tipo">
+              <option value="normal">Normal</option>
+              <option value="vip">VIP</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="valor">Valor da compra (R$)</label>
+            <input
+              type="number"
+              id="valor"
+              placeholder="0,00"
+              min="0"
+              step="0.01"
+            />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="desconto">Desconto / cupom (%)</label>
+          <input
+            type="number"
+            id="desconto"
+            placeholder="0"
+            min="0"
+            max="99"
+            step="1"
+            value="0"
+          />
+        </div>
+        <button class="btn-primary"id="calcularBtn" onclick="calcular()">
+          Calcular cashback
+        </button>
+      </div>
+
+      <!-- Resultado -->
+      <div class="result-card" id="resultCard">
+        <div class="result-header">
+          <div class="result-label">Cashback a receber</div>
+          <div class="result-value" id="rFinal">R$ 0,00</div>
+        </div>
+        <div class="result-detail" id="rDetails"></div>
+      </div>
+
+      <!-- Histórico -->
+      <div class="card">
+        <div class="section-title">
+          Histórico da sessão (identificado por IP)
+        </div>
+        <div class="metrics-grid" id="metricsGrid" style="display: none">
+          <div class="metric">
+            <div class="metric-label">Consultas</div>
+            <div class="metric-value" id="mCount">0</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Total compras</div>
+            <div class="metric-value" id="mCompras">R$&nbsp;0</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Total cashback</div>
+            <div class="metric-value" id="mCash">R$&nbsp;0</div>
+          </div>
+        </div>
+        <div id="histList">
+          <div class="hist-empty">Nenhuma consulta registrada ainda.</div>
+        </div>
+      </div>
+
+      <footer>
+        Regras: 5% base · VIP +10% sobre base · Compras &gt; R$&nbsp;500 = dobro
+      </footer>
+    </div>
+
+    <script>
+      /*
+       * cashback.js — Engine de cálculo (espelho do cashback.py)
+       *
+       * Regras:
+       *   1. Valor final = valor_produto × (1 - desconto%)
+       *   2. Cashback base = valor_final × 5%
+       *   3. Se VIP: cashback_vip = cashback_base × 1.10
+       *   4. Se valor_final > 500: cashback_final = cashback_anterior × 2
+       */
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          calcular();
+        }
+      });
+      
+      const RATE = 0.05,
+        VIP_BONUS = 0.1,
+        THRESHOLD = 500;
+      const history = []; // array de objetos de consulta
+      const fmt = (v) =>
+        v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+      function calcularCashback({ valor, desconto, isVip }) {
+        const descVal = valor * (desconto / 100);
+        const valorFinal = valor - descVal;
+        const cashBase = valorFinal * RATE;
+        const cashVip = isVip ? cashBase * (1 + VIP_BONUS) : cashBase;
+        const dobroAp = valorFinal > THRESHOLD;
+        const cashFinal = dobroAp ? cashVip * 2 : cashVip;
+        return { descVal, valorFinal, cashBase, cashVip, cashFinal, dobroAp };
+      }
+
+      function calcular() {
+        const tipo = document.getElementById("tipo").value;
+        const valor = parseFloat(document.getElementById("valor").value);
+        const desconto =
+          parseFloat(document.getElementById("desconto").value) || 0;
+
+        if (!valor || valor <= 0) {
+          alert("Informe um valor de compra válido.");
+          return;
+        }
+        if (desconto < 0 || desconto >= 100) {
+          alert("O desconto deve ser entre 0% e 99%.");
+          return;
+        }
+
+        const isVip = tipo === "vip";
+        const res = calcularCashback({ valor, desconto, isVip });
+
+        // ── Renderiza resultado ──────────────────────────────────────────
+        document.getElementById("rFinal").textContent = fmt(res.cashFinal);
+
+        let html = `
+        <div class="detail-row"><span class="detail-key">Valor produto (bruto)</span><span class="detail-val">${fmt(valor)}</span></div>
+        <div class="detail-row"><span class="detail-key">Desconto (${desconto}%)</span><span class="detail-val">−${fmt(res.descVal)}</span></div>
+        <div class="detail-row"><span class="detail-key">Valor final (base cálculo)</span><span class="detail-val">${fmt(res.valorFinal)}</span></div>
+        <div class="detail-row"><span class="detail-key">Cashback base (5%)</span><span class="detail-val">${fmt(res.cashBase)}</span></div>`;
+        if (isVip)
+          html += `<div class="detail-row"><span class="detail-key">Bônus VIP (+10%)</span><span class="detail-val">${fmt(res.cashVip)} <span class="badge badge-vip">VIP</span></span></div>`;
+        if (res.dobroAp)
+          html += `<div class="detail-row"><span class="detail-key">Regra dobro (>R$&nbsp;500)</span><span class="detail-val">${fmt(res.cashFinal)} <span class="badge badge-dobro">×2</span></span></div>`;
+
+        document.getElementById("rDetails").innerHTML = html;
+        document.getElementById("resultCard").style.display = "block";
+
+        // ── Registra no histórico (simulado por sessão) ──────────────────
+        history.unshift({
+          tipo: isVip ? "VIP" : "Normal",
+          valor,
+          desconto,
+          valorFinal: res.valorFinal,
+          cashFinal: res.cashFinal,
+        });
+        renderHistory();
+      }
+
+      function renderHistory() {
+        const list = document.getElementById("histList");
+        const grid = document.getElementById("metricsGrid");
+        if (!history.length) {
+          list.innerHTML =
+            '<div class="hist-empty">Nenhuma consulta registrada ainda.</div>';
+          grid.style.display = "none";
+          return;
+        }
+
+        grid.style.display = "grid";
+        const totCompras = history.reduce((a, h) => a + h.valorFinal, 0);
+        const totCash = history.reduce((a, h) => a + h.cashFinal, 0);
+        document.getElementById("mCount").textContent = history.length;
+        document.getElementById("mCompras").textContent = fmt(totCompras);
+        document.getElementById("mCash").textContent = fmt(totCash);
+
+        list.innerHTML = history
+          .map(
+            (h) => `
+        <div class="hist-row">
+          <div>
+            <div class="hist-tipo">Cliente ${h.tipo}</div>
+            <div class="hist-sub">${fmt(h.valor)} ${h.desconto > 0 ? `· ${h.desconto}% off` : ""} → final ${fmt(h.valorFinal)}</div>
+          </div>
+          <div class="hist-cash">${fmt(h.cashFinal)}</div>
+        </div>`,
+          )
+          .join("");
+      }
+    </script>
+  </body>
+</html>
