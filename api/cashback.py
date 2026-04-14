@@ -1,4 +1,4 @@
-CASHBACK_BASE_RATE = 0.05          
+'''CASHBACK_BASE_RATE = 0.05          
 VIP_BONUS_RATE = 0.10              
 DOUBLE_CASHBACK_THRESHOLD = 500.0  
 
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     print(r3["detalhes"])
 
     print()
-    print(separador)
+    print(separador)'''
     print("CENÁRIO 4 (Suporte) — Cliente VIP | R$ 600 | Cupom 15% off")
     print(separador)
     r4 = calcular_cashback(valor_produto=600, percentual_desconto=15, is_vip=True)
