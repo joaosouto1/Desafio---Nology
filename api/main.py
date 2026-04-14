@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 
-import psycopg2
 import psycopg2.pool
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,7 +9,7 @@ from pydantic import BaseModel, field_validator
 # ── Config 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://user:password@localhost:5432/cashback_db"
+    "postgresql://neondb_owner:npg_6odKq4PNHRea@ep-dark-sea-am9v6b67-pooler.c-5.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 )
 
 app = FastAPI(title="Cashback API", version="1.0.0")
@@ -55,11 +54,6 @@ def init_db():
         conn.commit()
     finally:
         conn.close()
-
-
-@app.on_event("startup")
-def startup_event():
-    init_db()
 
 
 # ── Schemas 
