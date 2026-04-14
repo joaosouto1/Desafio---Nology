@@ -1,9 +1,11 @@
+import os
+from datetime import datetime
+
+import psycopg2
+import psycopg2.pool
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
-import psycopg2
-import os
-from datetime import datetime
 
 # ── Config 
 DATABASE_URL = os.getenv(
