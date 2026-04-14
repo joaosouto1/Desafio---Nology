@@ -1,4 +1,4 @@
-import os
+'''import os
 from datetime import datetime
 
 import psycopg2.pool
@@ -186,7 +186,7 @@ def historico(request: Request):
             }
             for r in rows
         ],
-    }
+    }'''
 
 
 @app.get("/health")
