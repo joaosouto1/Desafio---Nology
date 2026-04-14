@@ -1,14 +1,3 @@
-"""
-Backend FastAPI — API de Cashback com histórico por IP
-=======================================================
-Instalar: pip install fastapi uvicorn psycopg2-binary
-Rodar:    uvicorn api:app --reload --port 8000
-
-Endpoints:
-  POST /calcular   → calcula cashback e salva no banco
-  GET  /historico  → retorna histórico do IP solicitante
-"""
-
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
@@ -16,7 +5,7 @@ import psycopg2
 import os
 from datetime import datetime
 
-# ── Config ────────────────────────────────────────────────────────────────────
+# ── Config 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
     "postgresql://user:password@localhost:5432/cashback_db"
@@ -26,24 +15,24 @@ app = FastAPI(title="Cashback API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],           # em produção, restringir ao domínio do frontend
+    allow_origins=["*"],           
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
-# ── Regras de negócio ─────────────────────────────────────────────────────────
-CASHBACK_BASE_RATE      = 0.05   # 5%
-VIP_BONUS_RATE          = 0.10   # +10% sobre base
-DOUBLE_CASHBACK_THRESHOLD = 500.0  # valor final acima disso = dobro
+# ── Regras de negócio 
+CASHBACK_BASE_RATE      = 0.05   
+VIP_BONUS_RATE          = 0.10   
+DOUBLE_CASHBACK_THRESHOLD = 500.0  
 
 
-# ── DB helpers ────────────────────────────────────────────────────────────────
+# ── DB helpers 
 def get_conn():
     return psycopg2.connect(DATABASE_URL)
 
 
 def init_db():
-    """Cria a tabela de consultas se não existir."""
+    #Cria a tabela de consultas se não existir.
     ddl = """
     CREATE TABLE IF NOT EXISTS consultas (
         id          SERIAL PRIMARY KEY,
@@ -71,7 +60,7 @@ def startup_event():
     init_db()
 
 
-# ── Schemas ───────────────────────────────────────────────────────────────────
+# ── Schemas 
 class CalcularRequest(BaseModel):
     tipo_cliente:     str   # "normal" | "vip"
     valor_produto:    float
@@ -99,7 +88,7 @@ class CalcularRequest(BaseModel):
         return v
 
 
-# ── Engine de cálculo (espelho do cashback.py) ────────────────────────────────
+# ── Engine de cálculo (espelho do cashback.py) 
 def calcular_cashback(tipo: str, valor: float, desconto: float) -> dict:
     """
     Aplica as regras de negócio documentadas:
@@ -128,7 +117,7 @@ def calcular_cashback(tipo: str, valor: float, desconto: float) -> dict:
     }
 
 
-# ── Endpoints ─────────────────────────────────────────────────────────────────
+# ── Endpoints 
 @app.post("/calcular")
 def calcular(req: CalcularRequest, request: Request):
     """Calcula cashback, persiste no banco e retorna o resultado."""
@@ -166,7 +155,7 @@ def calcular(req: CalcularRequest, request: Request):
 
 @app.get("/historico")
 def historico(request: Request):
-    """Retorna as últimas 50 consultas do IP que faz a requisição."""
+    #Retorna as últimas 50 consultas do IP que faz a requisição.
     ip = request.headers.get("X-Forwarded-For", request.client.host).split(",")[0].strip()
 
     conn = get_conn()

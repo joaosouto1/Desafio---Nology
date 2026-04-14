@@ -1,21 +1,6 @@
-"""
-Módulo de cálculo de cashback - Fintech Cashback Program
-=========================================================
-
-Regras de negócio (conforme documentação):
-  - Doc 1 (PO, 3 meses atrás):
-      * Cashback base: 5% sobre o valor FINAL da compra (após descontos)
-      * VIP recebe 10% de bônus ADICIONAL sobre o cashback base
-        → cashback_vip = cashback_base * 1.10
-  - Doc 2 (Diretor Comercial, 2 meses atrás):
-      * Compras acima de R$ 500: dobro do cashback (vale para todos, incluindo VIPs)
-  - Doc 3 (Anotação de reunião, 1 mês atrás):
-      * Ordem: calcular cashback base primeiro → depois aplicar bônus VIP
-"""
-
-CASHBACK_BASE_RATE = 0.05          # 5%
-VIP_BONUS_RATE = 0.10              # 10% adicional sobre o cashback base
-DOUBLE_CASHBACK_THRESHOLD = 500.0  # Compras acima deste valor = dobro
+CASHBACK_BASE_RATE = 0.05          
+VIP_BONUS_RATE = 0.10              
+DOUBLE_CASHBACK_THRESHOLD = 500.0  
 
 
 def calcular_cashback(
@@ -23,46 +8,26 @@ def calcular_cashback(
     percentual_desconto: float = 0.0,
     is_vip: bool = False
 ) -> dict:
-    """
-    Calcula o cashback final aplicando todas as regras de negócio.
-
-    Args:
-        valor_produto:       Valor bruto do produto (antes de qualquer desconto).
-        percentual_desconto: Percentual de desconto a aplicar (ex: 20 para 20%).
-        is_vip:              True se o cliente é VIP.
-
-    Returns:
-        Dicionário com detalhes completos do cálculo:
-            valor_produto        → valor bruto informado
-            desconto_aplicado    → valor em R$ do desconto
-            valor_final          → valor após desconto (base de cálculo)
-            cashback_base        → 5% sobre o valor_final
-            cashback_pos_vip     → cashback após aplicar bônus VIP (se aplicável)
-            cashback_final       → valor de cashback final (após dobro, se aplicável)
-            dobro_aplicado       → True se a regra de dobro foi ativada
-            detalhes             → string explicativa do cálculo
-    """
     if valor_produto < 0:
         raise ValueError("O valor do produto não pode ser negativo.")
     if not (0 <= percentual_desconto < 100):
         raise ValueError("O percentual de desconto deve ser entre 0 e 99.99.")
 
-    # ── Passo 1: Valor final após desconto (base de cálculo do cashback) 
+    # ── Valor final após desconto 'base de cálculo do cashback' 
     desconto_aplicado = valor_produto * (percentual_desconto / 100)
     valor_final = valor_produto - desconto_aplicado
 
-    # ── Passo 2: Cashback base (5% sobre o valor final) 
+    # ── Cashback base '5% sobre o valor final' 
     cashback_base = valor_final * CASHBACK_BASE_RATE
 
-    # ── Passo 3: Bônus VIP (+10% sobre o cashback base) 
-    # Conforme Doc 3: calcular base primeiro, depois aplicar VIP
+    # ── Bônus VIP '+10% sobre o cashback base'
     if is_vip:
         cashback_pos_vip = cashback_base * (1 + VIP_BONUS_RATE)
     else:
         cashback_pos_vip = cashback_base
 
-    # ── Passo 4: Regra de dobro para compras acima de R$ 500 
-    # Conforme Doc 2: aplica sobre o cashback já calculado (inclusive VIP)
+    # ── Regra de dobro para compras acima de R$ 500 
+    #aplica sobre o cashback já calculado (inclusive VIP)
     dobro_aplicado = valor_final > DOUBLE_CASHBACK_THRESHOLD
     if dobro_aplicado:
         cashback_final = cashback_pos_vip * 2
